@@ -223,9 +223,9 @@ def resetGame(balls, assignPegScreenLocation, createPegColors, bucket, pegs, ori
     frameRate = 144
     LongShotBonus = False
     # change the song
-    stopMusic()
-    loadRandMusic()
-    playMusic()
+    #stopMusic()
+    #loadRandMusic()
+    #playMusic()
     staticImage = createStaticImage(pegs)
     return ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, LongShotBonus, staticImage
 
