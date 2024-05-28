@@ -1,5 +1,6 @@
 import sys  # used to exit the program immediately
-
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 ##### local imports #####
 try:
     from local.config import *
