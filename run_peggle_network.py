@@ -23,7 +23,7 @@ from gamestate import *
 import math
 
 def getGameID(games_queue: list[tuple[controller_templates.Controller, int]], sub_index: int):
-    print(games_queue[0])
+    #print(games_queue[0])
     return games_queue[0][0].ID + "_" + str(sub_index)
 
 def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, int]]):
