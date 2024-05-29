@@ -25,13 +25,13 @@ os.chdir("../")
 import controller_templates
 from gamestate import *
 import math
-os.chdir("pegglepy")
 
 def getGameID(games_queue: list[tuple[controller_templates.Controller, int]], sub_index: int):
     #print(games_queue[0])
     return games_queue[0][0].ID + "_" + str(sub_index)
 
 def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, int]]):
+    os.chdir("pegglepy")
     ### testing stuff ###
     balls: list[Ball]
     balls = []
@@ -252,4 +252,5 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
         # bucket, pass the power up info for the bucket to update its collison and image
         bucket.update(powerUpType, powerUpActive)
     pygame.quit()
+    os.chdir("../")
     return (results, history)
