@@ -34,18 +34,14 @@ def getBallScreenLocation(b: Ball, segmentCount) -> list[int]:
 def getScoreMultiplier(remainingOrangePegs, pegsHit=0) -> int:
     # first multiplier based on remaining orange pegs
     multiplier = 1
-    if remainingOrangePegs >= 30:
-        multiplier = 1
-    elif remainingOrangePegs >= 25 and remainingOrangePegs < 30:
-        multiplier = 2
-    elif remainingOrangePegs >= 15 and remainingOrangePegs < 25:
+    if remainingOrangePegs <= 3:
+        multiplier = 10
+    elif remainingOrangePegs <= 6:
         multiplier = 5
-    elif remainingOrangePegs >= 5 and remainingOrangePegs < 15:
-        multiplier = 100
-    elif remainingOrangePegs >= 2 and remainingOrangePegs < 5:
-        multiplier = 500
-    elif remainingOrangePegs >= 1 and remainingOrangePegs < 2:
-        multiplier = 2000
+    elif remainingOrangePegs <= 10:
+        multiplier = 3
+    elif remainingOrangePegs <= 15:
+        multiplier = 2
 
     # second multiplier based on number of pegs hit by the current ball
     if pegsHit >= 10 and pegsHit < 15:
