@@ -45,7 +45,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
     pegsHit = 0
     done = False
     launchAim = Vector(0, 0)
-    longShotBonus = False
 
     pegs: list[Peg]
     pegs, originPegs, orangeCount, levelFileName = loadDefaultLevel()
@@ -136,17 +135,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                                     p.ballStuckTimer.cancleTimer()
                                     b.lastPegHit = None
 
-                            # check for long shot bonus
-                            if b.lastPegHitPos != p.pos and b.lastPegHitPos != None and p.color == "orange" and not p.isHit:
-                                if distBetweenTwoPoints(b.lastPegHitPos.x, b.lastPegHitPos.y, p.pos.x, p.pos.y) > longShotDistance:
-                                    if not longShotBonus:
-                                        score += 25000
-                                        b.lastPegHitPos = None
-                                        longShotBonus = True
-
-                            # used for long shot check
-                            b.lastPegHitPos = p.pos
-
                             # peg color update and powerup sounds
                             if not p.isHit:
                                 p.isHit = True
@@ -218,7 +206,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                 })
                 score_this_turn = 0
                 pegsHit = 0
-                longShotBonus = False
                 for _ in range(8):  # temporary fix to bug with pegs not being removed
                     for p in pegs:
                         if p.isHit:
