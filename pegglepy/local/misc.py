@@ -1,5 +1,5 @@
 import pygame
-from math import sqrt
+from math import sqrt, floor, ceil
 from random import randint
 
 ### local imports ###
@@ -23,12 +23,18 @@ def assignPegScreenLocation(pegs: list[Peg], segmentCount: int):
 
 def getBallScreenLocation(b: Ball, segmentCount) -> list[int]:
     segmentWidth = WIDTH/segmentCount
-    locations = []
-    for i in range(segmentCount+1):
-        if b.pos.x > segmentWidth*(i-1) - b.radius and b.pos.x < segmentWidth*i + b.radius:
-            locations.append(i)
+    pos1 = ceil((b.pos.x - b.radius)/segmentWidth)
+    pos2 = ceil((b.pos.x + b.radius)/segmentWidth)
 
-    return locations
+    if pos1 == pos2: return [pos1]
+    else: return [pos1, pos2]
+
+    # for i in range(segmentCount+1):
+    #     if b.pos.x > segmentWidth*(i-1) - b.radius and b.pos.x < segmentWidth*i + b.radius:
+    #         locations.append(i)
+    #         break
+
+    # return locations
 
 
 def getScoreMultiplier(remainingOrangePegs, pegsHit=0) -> int:
