@@ -602,9 +602,8 @@ while gameRunning:
                     # ball physics and game logic
                     shouldCheckCollision = False
                     for ballScreenPos in ballScreenPosList:
-                        for pegScreenLocation in p.pegScreenLocations:
-                            if ballScreenPos == pegScreenLocation:
-                                shouldCheckCollision = True
+                        if ballScreenPos in p.pegScreenLocations:
+                            shouldCheckCollision = True
 
                     if shouldCheckCollision:
                         if useCPhysics:
