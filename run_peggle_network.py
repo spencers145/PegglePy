@@ -1,6 +1,8 @@
 import sys  # used to exit the program immediately
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+os.chdir("pegglepy")
+
 ##### local imports #####
 try:
     from local.config import *
@@ -19,9 +21,11 @@ except ImportError as e:
     print("Exiting...")
     sys.exit(1)
 
+os.chdir("../")
 import controller_templates
 from gamestate import *
 import math
+os.chdir("pegglepy")
 
 def getGameID(games_queue: list[tuple[controller_templates.Controller, int]], sub_index: int):
     #print(games_queue[0])
