@@ -575,9 +575,12 @@ while gameRunning:
         for b in balls:
             if b.isAlive:
                 ballScreenPosList = getBallScreenLocation(b, segmentCount)
+                ball_pos_1 = ballScreenPosList[0]
+                if len(ballScreenPosList) > 1:
+                    ball_pos_2 = ballScreenPosList[1]
+                else: ball_pos_2 = False
                 #### collision ####
                 for p in pegs:
-
                     # if the current peg is the last remaining orange peg then apply special effects
                     if p.color == "orange" and orangeCount == 1 and not p.isHit:
                         if useCPhysics:
@@ -600,12 +603,7 @@ while gameRunning:
                             frameRate = 144
 
                     # ball physics and game logic
-                    shouldCheckCollision = False
-                    for ballScreenPos in ballScreenPosList:
-                        if ballScreenPos in p.pegScreenLocations:
-                            shouldCheckCollision = True
-
-                    if shouldCheckCollision:
+                    if ball_pos_1 in p.pegScreenLocations or (ball_pos_2 and ball_pos_2 in p.pegScreenLocations):
                         if useCPhysics:
                             ballTouchingPeg = isBallTouchingPeg(
                                 p.pos.x, p.pos.y, p.radius, b.pos.x, b.pos.y, b.radius)
@@ -761,9 +759,8 @@ while gameRunning:
                 b.update()
 
                 # check if ball has hit the sides of the bucket
-                isBallCollidedBucket, collidedPeg = bucket.isBallCollidingWithBucketEdge(
-                    b)
-                if isBallCollidedBucket:
+                collidedPeg = bucket.isBallCollidingWithBucketEdge(b)
+                if collidedPeg:
                     if useCPhysics:
                         # use the c implementation of the collision check
                         b = resolveCollision(b, collidedPeg)

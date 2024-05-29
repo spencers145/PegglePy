@@ -25,6 +25,7 @@ os.chdir("../")
 import controller_templates
 from gamestate import *
 import math
+import time
 
 def getGameID(games_queue: list[tuple[controller_templates.Controller, int]], sub_index: int):
     #print(games_queue[0])
@@ -70,8 +71,11 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
 
     history[game_id] = []
 
+    loop_time = 0
+
     ##### main loop #####
     while len(games_queue) > 0:
+        loop_start = time.perf_counter()
         launch_button = True
 
         # feed the network all the info about the gamestate
@@ -80,8 +84,10 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
             angle, bucket_pos = games_queue[0][0].getShot(GameState(pegs, ballsRemaining, score))
             launchAim = Vector(math.cos(angle),math. sin(angle))
 
+
         # if mouse clicked then trigger ball launch
         if launch_button and not ball.isAlive and len(balls) < 2:
+            launch_start = time.perf_counter()
             ball.isLaunch = True
             ball.isAlive = True
 
@@ -94,97 +100,84 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
             shouldClear = True
 
         # update ball physics and pegs, additional game logic
-        for b in balls:
-            if b.isAlive:
-                ballScreenPosList = getBallScreenLocation(b, segmentCount)
-                #### collision ####
-                for p in pegs:
-                    # ball physics and game logic
-                    shouldCheckCollision = False
-                    for ballScreenPos in ballScreenPosList:
-                        for pegScreenLocation in p.pegScreenLocations:
-                            if ballScreenPos == pegScreenLocation:
-                                shouldCheckCollision = True
+        if ball.isAlive:
+            ballScreenPosList = getBallScreenLocation(ball, segmentCount)
+            ball_pos_1 = ballScreenPosList[0]
+            if len(ballScreenPosList) > 1:
+                ball_pos_2 = ballScreenPosList[1]
+            else: ball_pos_2 = False
 
-                    if shouldCheckCollision:
-                        ballTouchingPeg = isBallTouchingPeg(
-                            p.pos.x, p.pos.y, p.radius, b.pos.x, b.pos.y, b.radius)
-                        if ballTouchingPeg:
-                            # resolve the collision between the ball and peg
-                            # use the c implementation of the collision check
-                            b = resolveCollision(b, p)
+            #### collision ####
+            for p in pegs:
+                # ball physics and game logic
+                if ball_pos_1 in p.pegScreenLocations or (ball_pos_2 and ball_pos_2 in p.pegScreenLocations):
+                    if isBallTouchingPeg(p.pos.x, p.pos.y, p.radius, ball.pos.x, ball.pos.y, ball.radius):
+                        # resolve the collision between the ball and peg
+                        # use the c implementation of the collision check
+                        ball = resolveCollision(ball, p)
 
-                            # save the peg that was last hit, used for when the ball is stuck and for bonus points
-                            b.lastPegHit = p
+                        # save the peg that was last hit, used for when the ball is stuck and for bonus points
+                        ball.lastPegHit = p
 
-                            # automatically remove pegs that a ball is stuck on
-                            if autoRemovePegs:
-                                p.ballStuckTimer.update()
+                        # automatically remove pegs that a ball is stuck on
+                        if autoRemovePegs:
+                            p.ballStuckTimer.update()
 
-                                # when timer has triggered, remove the last hit peg
-                                if p.ballStuckTimer.isTriggered and b.lastPegHit != None:
-                                    pegs.remove(b.lastPegHit)  # remove the peg
-                                    b.lastPegHit = None
-                                    p.ballStuckTimer.cancleTimer()
+                            # when timer has triggered, remove the last hit peg
+                            if p.ballStuckTimer.isTriggered and ball.lastPegHit != None:
+                                pegs.remove(ball.lastPegHit)  # remove the peg
+                                ball.lastPegHit = None
+                                p.ballStuckTimer.cancleTimer()
 
-                                # if the velocity is less than 0.5 then it might be stuck, wait a few seconds and remove the peg its stuck on
-                                if b.vel.getMag() <= 0.5 and p.ballStuckTimer.isActive == False:
-                                    p.ballStuckTimer.setTimer(
-                                        autoRemovePegsTimerValue)
-                                elif b.vel.getMag() > 0.5:
-                                    p.ballStuckTimer.cancleTimer()
-                                    b.lastPegHit = None
+                            # if the velocity is less than 0.5 then it might be stuck, wait a few seconds and remove the peg its stuck on
+                            if ball.vel.getMag() <= 0.5 and p.ballStuckTimer.isActive == False:
+                                p.ballStuckTimer.setTimer(
+                                    autoRemovePegsTimerValue)
+                            elif ball.vel.getMag() > 0.5:
+                                p.ballStuckTimer.cancleTimer()
+                                ball.lastPegHit = None
 
-                            # peg color update and powerup sounds
-                            if not p.isHit:
-                                p.isHit = True
-                                pegsHit += 1
-                                p.update_color()  # change the color to signify it has been hit
-                                if p.color == "orange":
-                                    orangeCount -= 1
-                                if p.isPowerUp:
-                                    powerUpCount += 1
-                                    powerUpActive = True
+                        # peg color update and powerup sounds
+                        if not p.isHit:
+                            p.isHit = True
+                            pegsHit += 1
+                            p.update_color()  # change the color to signify it has been hit
+                            if p.color == "orange":
+                                orangeCount -= 1
+                            if p.isPowerUp:
+                                powerUpCount += 1
+                                powerUpActive = True
+                            
+                            # keep track of points earned
+                            added_score = (p.points * getScoreMultiplier(orangeCount, pegsHit))
+                            score_this_turn += added_score
+                            score += added_score
+            
+            ball.update()
 
-                                # keep track of points earned
-                                added_score = (p.points * getScoreMultiplier(orangeCount, pegsHit))
-                                score_this_turn += added_score
-                                score += added_score
+            # check if ball has hit the sides of the bucket
+            collidedPeg = bucket.isBallCollidingWithBucketEdge(ball)
+            if collidedPeg:
+                # use the c implementation of the collision check
+                ball = resolveCollision(ball, collidedPeg)
+            
+            # if ball went in the bucket
+            if not ball.inBucket and bucket.isInBucket(ball.pos.x, ball.pos.y):
+                ball.inBucket = True  # prevent the ball from triggering it multiple times
+                ballsRemaining += 1
+            
 
-                b.update()
-
-                # check if ball has hit the sides of the bucket
-                isBallCollidedBucket, collidedPeg = bucket.isBallCollidingWithBucketEdge(b)
-                if isBallCollidedBucket:
-                    # use the c implementation of the collision check
-                    b = resolveCollision(b, collidedPeg)
-
-                # if active spooky powerup
-                if powerUpActive:
-                    if b.pos.y + b.radius > HEIGHT:
-                        b.pos.y = 0 + b.radius
-                        b.inBucket = False
-                        powerUpCount -= 1
-                        if powerUpCount < 1:
-                            powerUpActive = False
-
-                # if ball went in the bucket
-                if not b.inBucket and bucket.isInBucket(b.pos.x, b.pos.y):
-                    b.inBucket = True  # prevent the ball from triggering it multiple times
-                    ballsRemaining += 1
-
-            # remove any 'dead' balls
-            elif not b.isAlive and b != ball:
-                balls.remove(b)
-
-        # this little loop and if statement will determine if any of the balls are still alive and therfore if everything should be cleared/reset or not
-        done = True
-        for b in balls:
-            if b.isAlive:
-                done = False
-                break
-
-        if done:
+            # if active spooky powerup
+            if powerUpActive:
+                if ball.pos.y + ball.radius > HEIGHT:
+                    ball.pos.y = 0 + ball.radius
+                    ball.inBucket = False
+                    powerUpCount -= 1
+                    if powerUpCount < 1:
+                        powerUpActive = False
+        
+        
+        if not ball.isAlive:
             # reset everything and remove hit pegs
             if shouldClear:
                 shouldClear = False
@@ -238,6 +231,8 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
 
         # bucket, pass the power up info for the bucket to update its collison and image
         bucket.update(powerUpType, powerUpActive)
+        loop_time += time.perf_counter() - loop_start
     pygame.quit()
     os.chdir("../")
+    print("loops took %.9f" %(loop_time))
     return (results, history)
