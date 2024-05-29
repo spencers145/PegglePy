@@ -32,14 +32,13 @@ class basicNeuralNetworkController(Controller):
         super().__init__(id, self.pickNeuralNetworkAdvisedMove)
 
     def pickNeuralNetworkAdvisedMove(self, gamestate: GameState):
-        input = [0, 0, 0, 0]
+        input = [0, 0, 0]
         for peg in gamestate.PEGS:
             input[0] += 1
             if peg.isOrange: input[1] += 1
-        input[2] = gamestate.SCORE/100000
-        input[3] = gamestate.BALLS
+        input[2] = gamestate.BALLS
         
-        for _ in range(4, self.network.getInputSize()):
+        for _ in range(3, self.network.getInputSize()):
             input.append(random.random())
 
         self.network.updateInputs(input)
@@ -49,6 +48,12 @@ class basicNeuralNetworkController(Controller):
             out[0] -= 3
         while out[0] < -1.5:
             out[0] += 3
+        # what if we only give it 400ish shots to choose from? instead of practically infinite
+        out[0] = round(100*(out[0] + 0.5))/4 - 0.5
+            # idea: give the network only a single ball and try to find the best opening shot
+            # that idea is better for a network that plays with the orange-aware controller
+            # another good idea would be to give it sectors of the board
+            # break it up into pieces and tell it how many pieces are in each sector
         return out
 
 class orangeAwareNeuralNetworkController(Controller):
@@ -82,6 +87,7 @@ class orangeAwareNeuralNetworkController(Controller):
             out[0] -= 3
         while out[0] < -1.5:
             out[0] += 3
+        out[0] = round(100*(out[0] + 0.5))/100 - 0.5
         return out
     
 class fullNeuralNetworkController(Controller):
@@ -119,4 +125,5 @@ class fullNeuralNetworkController(Controller):
             out[0] -= 3
         while out[0] < -1.5:
             out[0] += 3
+        out[0] = round(100*(out[0] + 0.5))/100 - 0.5
         return out
