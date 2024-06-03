@@ -10,7 +10,7 @@ class Controller:
     def getShot(self, gamestate) -> tuple[float, float]:
         return self.CONTROLLER_CALLABLE(gamestate)
 
-    def reset():
+    def reset(self):
         pass
 
 class randomController(Controller):
