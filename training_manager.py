@@ -14,7 +14,8 @@ def debugNetworkWeightSum(network: network.Network):
 def testNetworks(manager: peggle_manager.Manager,
              number_of_games_each: int,
              generation: list[tuple[int, network.Network]],
-             network_controller_template) -> int:
+             network_controller_template,
+             options = {}) -> tuple[int, network.Network]:
     manager.wipeHistory()
     manager.wipeResults()
 
@@ -25,7 +26,7 @@ def testNetworks(manager: peggle_manager.Manager,
         player = network_controller_template("controller_n%d" %(i), network)
         games.append((player, number_of_games_each))
 
-    manager.runGames(games)
+    manager.runGames(games, options)
     for game_id in manager.results.keys():
         # extract the index of the network we're dealing with
         controller_index = int(game_id.split("_")[1][1:])
@@ -40,6 +41,7 @@ def trainNetwork(generations: int,
                     base_tests_per_child: int,
                     layer_sizes: list[int],
                     network_controller_template,
+                    options = {},
                     verbose = False,
                     debug = False) -> tuple[float, network.Network, dict, dict]:
     manager = peggle_manager.Manager()
@@ -74,7 +76,7 @@ def trainNetwork(generations: int,
             tests = 3 if step == 1 else round(base_tests_per_child * 2**(step - 2))
             total_tests += tests
 
-            step_generation = testNetworks(manager, tests, generation, network_controller_template)
+            step_generation = testNetworks(manager, tests, generation, network_controller_template, options)
             generation = []
 
             # debug code that activates if verbose is on
@@ -101,7 +103,7 @@ def trainNetwork(generations: int,
             print("---------------")
 
     # get a final result to test the effectiveness of the model
-    score = testNetworks(manager, 5, [seed], network_controller_template)[0][0]
+    score = testNetworks(manager, 50, [(0, seed[1])], network_controller_template, options)[0][0]
 
     # explicitly print results if we are verbose
     # if verbose:

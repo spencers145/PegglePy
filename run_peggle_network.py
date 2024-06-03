@@ -31,8 +31,13 @@ def getGameID(games_queue: list[tuple[controller_templates.Controller, int]], su
     #print(games_queue[0])
     return games_queue[0][0].ID + "_" + str(sub_index)
 
-def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, int]]):
+def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, int]], options = {}):
     os.chdir("pegglepy")
+
+    if "balls" in options.keys():
+        base_balls = options["balls"]
+    else: base_balls = 10
+
     ### testing stuff ###
     balls: list[Ball]
     balls = []
@@ -62,6 +67,7 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
 
     ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                 balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+    ballsRemaining = base_balls
 
     history = {}
     results = {}
@@ -231,6 +237,7 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                 # reset the game
                 ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                     balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+                ballsRemaining = base_balls
 
         # bucket, pass the power up info for the bucket to update its collison and image
         bucket.update(powerUpType, powerUpActive)
