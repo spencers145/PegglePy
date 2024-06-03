@@ -1,5 +1,18 @@
 import network, peggle_manager, fitness_manager
 
+def minimizeFunction(guess: list[float], number_of_games: int, layer_sizes: list[int], network_controller_template, options = {}):
+    weights = network.listToWeights(guess, layer_sizes)
+    #print("minimize called")
+    return -testNetworkFromWeights(weights, number_of_games, layer_sizes, network_controller_template, options)
+
+def testNetworkFromWeights(weights: list[list[list[float]]], number_of_games: int, layer_sizes: list[int], network_controller_template, options = {}):
+    manager = peggle_manager.Manager()
+    network_to_test = network.Network(len(weights), layer_sizes)
+    network_to_test.setWeights(weights)
+
+    test_out = testNetworks(manager, number_of_games, [(0, network_to_test)], network_controller_template, options)
+    print(test_out)
+    return test_out[0][0]
 
 def debugNetworkWeightSum(network: network.Network):
     sum = 0

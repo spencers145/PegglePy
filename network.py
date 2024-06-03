@@ -1,5 +1,32 @@
 import random
 
+def listToWeights(weight_list: list[float], layer_sizes: list[int]) -> list[list[list[float]]]:
+    weights = []
+    index = 0
+
+    for i in range(0, len(layer_sizes)):
+        this_layer_weights = []
+        if i > 0:
+            for _ in range(0, layer_sizes[i]):
+                sub_weights = []
+                for _ in range(0, layer_sizes[i - 1]):
+                    sub_weights.append(weight_list[index])
+                    index += 1
+                this_layer_weights.append(sub_weights)
+        else:
+            for _ in range(0, layer_sizes[0]):
+                this_layer_weights.append([1])
+        weights.append(this_layer_weights)
+    return weights
+
+def weightsToList(weights: list[list[list[float]]]) -> list[float]:
+    weights_list = []
+    for i in range(1, len(weights)):
+        for j in range(0, len(weights[i])):
+            for k in range(0, len(weights[i][j])):
+                weights_list.append(weights[i][j][k])
+    return weights_list
+
 class Network:
     def __init__(self, layers: int, layer_sizes: list[int]):
         self.layers = []
