@@ -49,7 +49,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
     score = 0
     score_this_turn = 0
     pegsHit = 0
-    done = False
     launchAim = Vector(0, 0)
 
     pegs: list[Peg]
@@ -77,11 +76,8 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
 
     history[game_id] = []
 
-    loop_time = 0
-
     ##### main loop #####
     while len(games_queue) > 0:
-        loop_start = time.perf_counter()
         launch_button = True
 
         # feed the network all the info about the gamestate
@@ -93,7 +89,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
 
         # if mouse clicked then trigger ball launch
         if launch_button and not ball.isAlive and len(balls) < 2:
-            launch_start = time.perf_counter()
             ball.isLaunch = True
             ball.isAlive = True
 
@@ -241,8 +236,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
 
         # bucket, pass the power up info for the bucket to update its collison and image
         bucket.update(powerUpType, powerUpActive)
-        loop_time += time.perf_counter() - loop_start
     pygame.quit()
     os.chdir("../")
-    print("loops took %.9f" %(loop_time))
     return (results, history)
