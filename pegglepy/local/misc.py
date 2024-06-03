@@ -83,7 +83,7 @@ def createPegColors(pegs: list[Peg]) -> list[Peg]:
         i = randint(0, len(pegs)-1)
         p = pegs[i]
         p.color = "orange"
-        p.isOrang = True
+        p.isOrange = True
         p.update_color()
 
         # must have exactly 25 orange pegs
