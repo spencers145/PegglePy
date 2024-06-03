@@ -106,19 +106,15 @@ def trainNetwork(generations: int,
     score = testNetworks(manager, 50, [(0, seed[1])], network_controller_template, options)[0][0]
 
     # explicitly print results if we are verbose
-    # if verbose:
-    #     print("TRAINING PARAMETERS:")
-    #     print("Generations: %d" %(generations))
-    #     print("Children tested per generation: %d" %(generation_size))
-    #     print("Base # of test-games per child: %d" %(base_tests_per_child))
-    #     print("---------------")
-    #     print("Schema used: %s" %(schema.NAME))
-    #     print("Opponent count: %d" %(len(opponents)))
-    #     print("---------------")
-    #     print("RESULTS:")
-    #     print("Network proficiency: %.3f" %(score/10000))
-    #     print("Move distribution:")
-    #     for move in moves.keys():
-    #         print("%s: %.3f" %(move, moves[move]))
+    if verbose:
+        print("TRAINING PARAMETERS:")
+        print("Generations: %d" %(generations))
+        print("Children tested per generation: %d" %(generation_size))
+        print("Base # of test-games per child: %d" %(base_tests_per_child))
+        print("---------------")
+        print("Balls used: %s" %(10 if "balls" not in options.keys() else options["balls"]))
+        print("---------------")
+        print("RESULTS:")
+        print("Network proficiency: %.3f" %(score/25))
 
     return (score, seed[1], manager)
