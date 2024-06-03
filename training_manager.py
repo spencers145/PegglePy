@@ -84,8 +84,13 @@ def trainNetwork(generations: int,
                 debug_scores = []
                 for child in step_generation:
                     debug_scores.append(child[0])
+
+                debug_sum = 0
+                for score in debug_scores: debug_sum += score
+
                 debug_scores.sort(reverse=True)
                 print(debug_scores)
+                print("gen %d step %d average: %.2f" %(i, step, debug_sum/len(step_generation)/total_tests))
 
             # pop off the best math.ceil(len(generation)/(2*step)) players
             while len(generation) < target_survivor_count:
@@ -98,7 +103,7 @@ def trainNetwork(generations: int,
         # optional debug info about the seed we just trained
         # keeps track of the networks between generations
         if debug:
-            print("final proficiency: " + str(seed[0]/total_tests))
+            print("generation %d final proficiency: %.2f" %(i, seed[0]/total_tests))
             print("---------------")
 
     # get a final result to test the effectiveness of the model
@@ -114,6 +119,6 @@ def trainNetwork(generations: int,
         print("Balls used: %s" %(10 if "balls" not in options.keys() else options["balls"]))
         print("---------------")
         print("RESULTS:")
-        print("Network proficiency: %.3f" %(score/25))
+        print("Network proficiency: %.2f" %(score/50))
 
     return (score, seed[1], manager)
