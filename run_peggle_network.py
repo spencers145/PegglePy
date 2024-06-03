@@ -221,6 +221,9 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                 if sub_index >= games_queue[0][1]:
                     games_queue.pop(0)
                     sub_index = 0
+                else:
+                    # wipe anything relevant to this game from the controller's memory
+                    games_queue[0][0].reset()
                 if len(games_queue) > 0:
                     game_id = getGameID(games_queue, sub_index)
                     history[game_id] = []

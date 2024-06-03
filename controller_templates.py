@@ -10,6 +10,9 @@ class Controller:
     def getShot(self, gamestate) -> tuple[float, float]:
         return self.CONTROLLER_CALLABLE(gamestate)
 
+    def reset():
+        pass
+
 class randomController(Controller):
     def __init__(self, id: str):
         super().__init__(id, self.shootRandomly)
@@ -61,6 +64,9 @@ class orangeAwareNeuralNetworkController(Controller):
         self.network = network
         super().__init__(id, self.pickNeuralNetworkAdvisedMove)
         self.peg_memory = None
+    
+    def reset(self):
+        self.peg_memory = None
 
     def pickNeuralNetworkAdvisedMove(self, gamestate: GameState):
         if self.peg_memory is None:
@@ -69,6 +75,7 @@ class orangeAwareNeuralNetworkController(Controller):
                 peg = gamestate.PEGS[i]
                 self.peg_memory[(peg.pos.x, peg.pos.y)] = (i, int(peg.color == "orange"))
         input = []
+
         # note to self: make this not suck
         for _ in range(0, len(self.peg_memory.keys())):
             input.append(0)
@@ -99,6 +106,9 @@ class fullNeuralNetworkController(Controller):
         self.network = network
         super().__init__(id, self.pickNeuralNetworkAdvisedMove)
         self.peg_memory = None
+    
+    def reset(self):
+        self.peg_memory = None
 
     def pickNeuralNetworkAdvisedMove(self, gamestate: GameState):
         if self.peg_memory is None:
@@ -115,7 +125,7 @@ class fullNeuralNetworkController(Controller):
             memory = self.peg_memory[peg_pos]
             input[3 * memory[0] + 1] = memory[1]
             input[3 * memory[0] + 2] = memory[2]
-
+        
         for peg in gamestate.PEGS:
             input[3 * self.peg_memory[(peg.pos.x, peg.pos.y)][0]] = 1
 
