@@ -4,7 +4,7 @@ class Network:
     def __init__(self, layers: int, layer_sizes: list[int]):
         self.layers = []
         self.weights = []
-        for __i__ in range(0, layers):
+        for _ in range(0, layers):
             self.addLayer(layer_sizes)
 
     def addLayer(self, layer_sizes):
@@ -16,7 +16,7 @@ class Network:
         else: node_weights = [1]
 
         self_layer = []
-        for i in range(0, current_size):
+        for _ in range(0, current_size):
             self_layer.append(node_weights.copy())
         self.weights.append(self_layer)
         self.layers.append([0] * current_size)
