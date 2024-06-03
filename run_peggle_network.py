@@ -111,6 +111,8 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
             for p in pegs:
                 # ball physics and game logic
                 if ball_pos_1 in p.pegScreenLocations or (ball_pos_2 and ball_pos_2 in p.pegScreenLocations):
+                    score_this_turn += 0.2
+                    score += 0.2
                     if isBallTouchingPeg(p.pos.x, p.pos.y, p.radius, ball.pos.x, ball.pos.y, ball.radius):
                         # resolve the collision between the ball and peg
                         # use the c implementation of the collision check
