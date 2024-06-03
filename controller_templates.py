@@ -35,7 +35,7 @@ class basicNeuralNetworkController(Controller):
         input = [0, 0, 0]
         for peg in gamestate.PEGS:
             input[0] += 1
-            if peg.isOrange: input[1] += 1
+            if peg.color == "orange": input[1] += 1
         input[2] = gamestate.BALLS
         
         for _ in range(3, self.network.getInputSize()):
@@ -67,7 +67,7 @@ class orangeAwareNeuralNetworkController(Controller):
             self.peg_memory = {}
             for i in range(0, len(gamestate.PEGS)):
                 peg = gamestate.PEGS[i]
-                self.peg_memory[(peg.pos.x, peg.pos.y)] = (i, int(peg.isOrange))
+                self.peg_memory[(peg.pos.x, peg.pos.y)] = (i, int(peg.color == "orange"))
         input = []
         # note to self: make this not suck
         for _ in range(0, len(self.peg_memory.keys())):
@@ -101,7 +101,7 @@ class fullNeuralNetworkController(Controller):
             self.peg_memory = {}
             for i in range(0, len(gamestate.PEGS)):
                 peg = gamestate.PEGS[i]
-                self.peg_memory[(peg.pos.x, peg.pos.y)] = (i, int(peg.isOrange), int(peg.isPowerUp))
+                self.peg_memory[(peg.pos.x, peg.pos.y)] = (i, int(peg.color == "orange"), int(peg.color == "green"))
         input = []
         # note to self: make this not suck
         for _ in range(0, 3*len(self.peg_memory.keys())):
