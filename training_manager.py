@@ -30,8 +30,7 @@ def testNetworks(manager: peggle_manager.Manager,
     for game_id in manager.results.keys():
         # extract the index of the network we're dealing with
         controller_index = int(game_id.split("_")[1][1:])
-        #print(manager.results[game_id])
-        network_score = manager.results[game_id]["score"] * (1 if manager.results[game_id]["orange_pegs_left"] > 0 else 8)
+        network_score = manager.results[game_id]["score"] * (1 if manager.results[game_id]["orange_pegs_left"] > 0 else 2)
         generation[controller_index] = (generation[controller_index][0] + network_score, generation[controller_index][1])
 
     return generation
