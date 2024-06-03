@@ -52,7 +52,7 @@ class basicNeuralNetworkController(Controller):
         while out[0] < -1.5:
             out[0] += 3
         # what if we only give it 400ish shots to choose from? instead of practically infinite
-        out[0] = round(100*(out[0] + 0.5))/4 - 0.5
+        out[0] = round(100*(out[0] + 0.5))/100 - 0.5
             # idea: give the network only a single ball and try to find the best opening shot
             # that idea is better for a network that plays with the orange-aware controller
             # another good idea would be to give it sectors of the board
