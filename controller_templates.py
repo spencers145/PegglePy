@@ -39,7 +39,7 @@ class basicNeuralNetworkController(Controller):
         input[2] = gamestate.BALLS
         
         for _ in range(3, self.network.getInputSize()):
-            input.append(random.random())
+            input.append(0)
 
         self.network.updateInputs(input)
         self.network.update()
@@ -77,8 +77,12 @@ class orangeAwareNeuralNetworkController(Controller):
             memory = self.peg_memory[(peg.pos.x, peg.pos.y)]
             input[memory[0]] = memory[1]
 
-        for _ in range(len(self.peg_memory.keys()), self.network.getInputSize()):
-            input.append(random.random())
+        input.append(gamestate.BALLS)
+
+        for _ in range(len(self.peg_memory.keys()) + 1, self.network.getInputSize()):
+            input.append(0)
+
+        #print(input)
 
         self.network.updateInputs(input)
         self.network.update()
@@ -115,8 +119,12 @@ class fullNeuralNetworkController(Controller):
         for peg in gamestate.PEGS:
             input[3 * self.peg_memory[(peg.pos.x, peg.pos.y)][0]] = 1
 
-        for _ in range(3*len(self.peg_memory.keys()), self.network.getInputSize()):
-            input.append(random.random())
+        #print(input)
+
+        input.append(gamestate.BALLS)
+
+        for _ in range(3*len(self.peg_memory.keys()) + 1, self.network.getInputSize()):
+            input.append(0)
 
         self.network.updateInputs(input)
         self.network.update()
