@@ -73,7 +73,7 @@ def trainNetwork(generations: int,
 
             # test each network. give them a score.
             # the # of tests increases as we refine our selection
-            tests = 3 if step == 1 else round(base_tests_per_child * 2**(step - 2))
+            tests = 10 if step == 1 else round(base_tests_per_child * 2**(step - 2))
             total_tests += tests
 
             step_generation = testNetworks(manager, tests, generation, network_controller_template, options)
