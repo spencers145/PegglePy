@@ -15,3 +15,15 @@ development.ipynb
 !Level 1.lvl
 !Level 2.lvl
 ```
+pegglepy/fitness_manager.py
+pegglepy/controller_templates.py
+pegglepy/gamestate.py
+pegglepy/network.py
+pegglepy/out.txt
+pegglepy/peggle_manager.py
+pegglepy/README.md
+pegglepy/run_peggle_network.py
+pegglepy/test.py
+pegglepy/trainer.py
+pegglepy/training_manager.py
+pegglepy/training_multiprocessor.py
