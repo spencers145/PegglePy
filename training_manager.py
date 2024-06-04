@@ -1,13 +1,13 @@
 import network, peggle_manager, fitness_manager
 
-def minimizeFunction(guess: list[float], number_of_games: int, layer_sizes: list[int], network_controller_template, options = {}):
+def minimizeFunction(guess: list[float], number_of_games: int, layer_sizes: list[int], network_controller_template, activation_type: str, options = {}):
     weights = network.listToWeights(guess, layer_sizes)
     #print("minimize called")
-    return -testNetworkFromWeights(weights, number_of_games, layer_sizes, network_controller_template, options)
+    return -testNetworkFromWeights(weights, number_of_games, layer_sizes, network_controller_template, activation_type, options)
 
-def testNetworkFromWeights(weights: list[list[list[float]]], number_of_games: int, layer_sizes: list[int], network_controller_template, options = {}):
+def testNetworkFromWeights(weights: list[list[list[float]]], number_of_games: int, layer_sizes: list[int], network_controller_template, activation_type: str, options = {}):
     manager = peggle_manager.Manager()
-    network_to_test = network.Network(len(weights), layer_sizes)
+    network_to_test = network.Network(layer_sizes, activation_type)
     network_to_test.setWeights(weights)
 
     test_out = testNetworks(manager, number_of_games, [(0, network_to_test)], network_controller_template, options)
@@ -53,12 +53,13 @@ def trainNetwork(generations: int,
                     base_tests_per_child: int,
                     layer_sizes: list[int],
                     network_controller_template,
+                    activation_type: str,
                     options = {},
                     verbose = False,
                     debug = False) -> tuple[float, network.Network, dict, dict]:
     manager = peggle_manager.Manager()
     # set our seed
-    seed = (0, network.Network(len(layer_sizes), layer_sizes))
+    seed = (0, network.Network(layer_sizes, activation_type))
 
     for i in range(1, generations + 1):
         generation = []
@@ -66,7 +67,7 @@ def trainNetwork(generations: int,
         # if this is the first generation, make 10x more than usual
         for j in range(0, (10 * generation_size if i == 1 else generation_size)):
             # make a new network based on the seed
-            child_network = network.Network(len(layer_sizes), layer_sizes)
+            child_network = network.Network(layer_sizes, activation_type)
             child_network.setWeights(seed[1].weights)
             # jostle amount as a function of how many generations (i) and which child (j)
             # effectively, i increase precision over time
