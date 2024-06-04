@@ -25,7 +25,6 @@ os.chdir("../")
 import controller_templates
 from gamestate import *
 import math
-import time
 
 def getGameID(games_queue: list[tuple[controller_templates.Controller, int]], sub_index: int):
     #print(games_queue[0])
