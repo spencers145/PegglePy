@@ -1,5 +1,5 @@
 import pygame
-from math import sqrt, floor, ceil
+from math import sqrt, ceil
 from random import randint
 
 ### local imports ###
@@ -66,38 +66,35 @@ def getScoreMultiplier(remainingOrangePegs, pegsHit=0) -> int:
 
 
 def createPegColors(pegs: list[Peg]) -> list[Peg]:
-    orangeCount = 25
+    target_oranges = 25
 
-    if len(pegs) < 25:
+    if len(pegs) < 27:
         if debug:
-            print("WARN: Level has less than 25 pegs, continuing anyway...")
-        orangeCount = len(pegs) - 1
+            print("WARN: Level has less than 27 pegs, continuing anyway...")
+        target_oranges = 1 if len(pegs) <= 3 else len(pegs) - 2
+        target_greens = 2 if len(pegs) >= 3 else len(pegs) - target_oranges
     elif len(pegs) > 120:
         if debug:
             print(
                 "WARN: Level has excessive number of pegs, expect performance issues...")
 
+    peg_pool = pegs.copy()
+
     # create orange pegs
-    numOfOrangePegs = 0
-    while (numOfOrangePegs < orangeCount):
-        i = randint(0, len(pegs)-1)
-        p = pegs[i]
+    orange_count = 0
+    while orange_count < target_oranges:
+        i = randint(0, len(peg_pool) - 1)
+        p = peg_pool.pop(i)
         p.color = "orange"
         p.isOrange = True
         p.update_color()
 
-        # must have exactly 25 orange pegs
-        numOfOrangePegs = 0
-        for peg in pegs:
-            if peg.color == "orange":
-                numOfOrangePegs += 1
-
-        # invalid level, but we'll allow it with a warning
+        orange_count += 1
 
     # create green pegs
-    for _ in range(2):
-        i = randint(0, len(pegs)-1)
-        p = pegs[i]
+    for _ in range(target_greens):
+        i = randint(0, len(peg_pool) - 1)
+        p = peg_pool.pop(i)
         p.color = "green"
         p.isPowerUp = True
         p.update_color()
@@ -194,14 +191,12 @@ def createStaticCircles(trajectory: list[Ball]) -> pygame.Surface:
 # quite horrendous, will be fixed in the future... hopefully :)
 def resetGame(balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs):
     # reset everything
-    shouldClear = False
     balls.clear()  # clear all the balls
     balls.append(Ball(WIDTH/2, HEIGHT/25))  # recreate the original ball
     ball = balls[0]
     ball.reset()
     pitch = 1.0
     pitchRaiseCount = 0
-    done = False
     powerUpActive = False
     powerUpCount = 0
     ball = balls[0]
@@ -219,7 +214,6 @@ def resetGame(balls, assignPegScreenLocation, createPegColors, bucket, pegs, ori
     ballsRemaining = 10
     pegsHit = 0
     bucket.reset()
-    lastHitPeg = None
     gameOver = False
     alreadyPlayedOdeToJoy = False
     frameRate = 144
