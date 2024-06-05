@@ -524,7 +524,7 @@ while gameRunning:
 
         delayTimer.update()  # prevent the ball from launching instantly after the game is reset
         # if mouse clicked then trigger ball launch
-        if launch_button and not ball.isAlive and delayTimer.isTriggered and len(balls) < 2:
+        if launch_button and not ball.isAlive and delayTimer.isTriggered and len(balls) < 2 and ballsRemaining > 0:
             if powerUpActive and powerUpType == "guideball":
                 powerUpCount -= 1
                 if powerUpCount < 1:
