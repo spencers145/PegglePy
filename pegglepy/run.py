@@ -28,6 +28,11 @@ from settingsMenu import settingsMenu
 from editor import levelEditor
 from loadLevelMenu import loadLevelMenu
 
+from gamestate import *
+import live_test_manager
+
+import math
+
 import pygame
 
 ##### pygame stuff #####
@@ -103,6 +108,10 @@ zoom = 1
 
 pegs: list[Peg]
 
+if live_test_manager.should_do_live_test:
+    ballsRemaining = live_test_manager.starting_balls
+    
+
 ### main menu ###
 selection = "none"
 editorSelection = "none"
@@ -132,6 +141,7 @@ if selection != "quit":
     if editorSelection != "play":
         pegs, originPegs, orangeCount, levelFileName = loadLevelMenu(screen, debug)
         #pegs, originPegs, orangeCount, levelFileName = loadDefaultLevel()
+        #pegs, originPegs, orangeCount, levelFileName = loadLevel("levels/Level 1.lvl")
 
         delayTimer = TimedEvent(0.5)
     else:
@@ -163,7 +173,7 @@ else:
 
 ##### main loop #####
 while gameRunning:
-    launch_button = False
+    launch_button = live_test_manager.should_do_live_test and not gameOver
     gamePadFineTuneAmount = 0
     for event in pygame.event.get():  # check events and quit if the program is closed
         if event.type == pygame.QUIT:
@@ -173,6 +183,10 @@ while gameRunning:
                 # horrifying function that resets the game
                 ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                     balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+                if live_test_manager.should_do_live_test:
+                    ballsRemaining = live_test_manager.starting_balls
+                    
+                    live_test_manager.test_controller.reset()
                 if not musicEnabled:
                     pygame.mixer.music.stop()
             if event.key == pygame.K_1:  # enable or disable debug features
@@ -211,6 +225,10 @@ while gameRunning:
                 # horrifying function that resets the game
                 ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                     balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+                if live_test_manager.should_do_live_test:
+                    ballsRemaining = live_test_manager.starting_balls
+                    
+                    live_test_manager.test_controller.reset()
                 if not musicEnabled:
                     pygame.mixer.music.stop()
                 delayTimer = TimedEvent(0.50)
@@ -252,6 +270,10 @@ while gameRunning:
                 # reset the game
                 ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                     balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+                if live_test_manager.should_do_live_test:
+                    ballsRemaining = live_test_manager.starting_balls
+                    
+                    live_test_manager.test_controller.reset()
 
                 # prevent accidental click on launch
                 delayTimer = TimedEvent(0.5)
@@ -311,6 +333,10 @@ while gameRunning:
                     # reset the game
                     ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                         balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)  # horrifying function that resets the game
+                    if live_test_manager.should_do_live_test:
+                        ballsRemaining = live_test_manager.starting_balls
+                        
+                        live_test_manager.test_controller.reset()
                     if not musicEnabled:
                         pygame.mixer.music.stop()
                 if event.button == 4:  # the 'L1' button on a ps4 controller
@@ -361,6 +387,10 @@ while gameRunning:
                     # reset the game
                     ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                         balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+                    if live_test_manager.should_do_live_test:
+                        ballsRemaining = live_test_manager.starting_balls
+                        
+                        live_test_manager.test_controller.reset()
                     if not musicEnabled:
                         pygame.mixer.music.stop()
                 if event.button == 6:  # the 'start' button on an xbox controller
@@ -463,6 +493,10 @@ while gameRunning:
         # horrifying function that resets the game
         ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
             balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+        if live_test_manager.should_do_live_test:
+            ballsRemaining = live_test_manager.starting_balls
+            
+            live_test_manager.test_controller.reset()
         if not musicEnabled:
             pygame.mixer.music.stop()
 
@@ -500,7 +534,11 @@ while gameRunning:
 
         # launch ball
         if ball.isLaunch and ball.isAlive:
-            if not powerUpType == "zenball":  # if powerup type is anything but zenball, launch normal
+            if not powerUpType == "zenball":  # if powerup type is anything but zenball, launch normal 
+                if live_test_manager.should_do_live_test:
+                    angle, bucket_pos = live_test_manager.test_controller.getShot(GameState(pegs, ballsRemaining, score))
+                    launchAim = Vector(math.cos(angle) + ball.pos.x, math.sin(angle) + ball.pos.y)
+                    #print(launchAim.getAngleDeg())
                 launchForce = subVectors(launchAim, ball.pos)
                 launchForce.setMag(LAUNCH_FORCE)
                 ball.applyForce(launchForce)
@@ -1006,6 +1044,10 @@ while gameRunning:
             # reset the game
             ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                 balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+            if live_test_manager.should_do_live_test:
+                ballsRemaining = live_test_manager.starting_balls
+                
+                live_test_manager.test_controller.reset()
             if not musicEnabled:
                 pygame.mixer.music.stop()
             gamePaused = False
@@ -1019,6 +1061,10 @@ while gameRunning:
             # horrifying function that resets the game
             ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                 balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+            if live_test_manager.should_do_live_test:
+                ballsRemaining = live_test_manager.starting_balls
+                
+                live_test_manager.test_controller.reset()
             if not musicEnabled:
                 pygame.mixer.music.stop()
             gamePaused = False
@@ -1055,6 +1101,10 @@ while gameRunning:
                         # reset the game
                         ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                             balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+                        if live_test_manager.should_do_live_test:
+                            ballsRemaining = live_test_manager.starting_balls
+                            
+                            live_test_manager.test_controller.reset()
 
                 elif selection == "settings":
                     if settingsMenu(screen, debug) == "mainMenu":
@@ -1063,6 +1113,10 @@ while gameRunning:
             # reset the game
             ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                 balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+            if live_test_manager.should_do_live_test:
+                ballsRemaining = live_test_manager.starting_balls
+                
+                live_test_manager.test_controller.reset()
 
             # prevent accidental click on launch
             delayTimer = TimedEvent(0.5)
@@ -1110,6 +1164,10 @@ while gameRunning:
                             # reset the game
                             ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                                 balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+                            if live_test_manager.should_do_live_test:
+                                ballsRemaining = live_test_manager.starting_balls
+                                
+                                live_test_manager.test_controller.reset()
                             
                             delayTimer = TimedEvent(0.50)
                         
@@ -1121,6 +1179,10 @@ while gameRunning:
                 # reset the game
                 ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                     balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+                if live_test_manager.should_do_live_test:
+                    ballsRemaining = live_test_manager.starting_balls
+                    
+                    live_test_manager.test_controller.reset()
                 
                 # prevent accidental click on launch
                 delayTimer = TimedEvent(0.5)
@@ -1145,6 +1207,10 @@ while gameRunning:
                 # reset the game
                 ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
                     balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
+                if live_test_manager.should_do_live_test:
+                    ballsRemaining = live_test_manager.starting_balls
+                    
+                    live_test_manager.test_controller.reset()
                 
                 delayTimer = TimedEvent(0.50)
 
