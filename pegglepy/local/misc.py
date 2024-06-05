@@ -104,9 +104,9 @@ def createPegColors(pegs: list[Peg]) -> list[Peg]:
     return pegs
 
 
-def loadLevel() -> tuple[list[Peg], list[Peg], int]:
+def loadLevel(filePath = None) -> tuple[list[Peg], list[Peg], int]:
     # load the pegs from a level file (pickle)
-    pegs, levelFileName = loadData()
+    pegs, levelFileName = loadData(filePath)
     originPegs = pegs.copy()
 
     pegs = createPegColors(pegs)
