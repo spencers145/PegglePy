@@ -67,12 +67,14 @@ def getScoreMultiplier(remainingOrangePegs, pegsHit=0) -> int:
 
 def createPegColors(pegs: list[Peg]) -> list[Peg]:
     target_oranges = 25
+    target_greens = 2
 
     if len(pegs) < 27:
         if debug:
             print("WARN: Level has less than 27 pegs, continuing anyway...")
         target_oranges = 1 if len(pegs) <= 3 else len(pegs) - 2
-        target_greens = 2 if len(pegs) >= 3 else len(pegs) - target_oranges
+        if len(pegs) <= 2:
+            target_greens = len(pegs) - target_oranges
     elif len(pegs) > 120:
         if debug:
             print(
