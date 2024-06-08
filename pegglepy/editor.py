@@ -65,10 +65,9 @@ def levelEditor(screen: pygame.Surface, clock: pygame.time.Clock, debug: bool = 
                     staticImg = createStaticImage(pegs)
                 # save level
                 if event.key == pygame.K_s:
-                    if len(pegs) == 0 or len(pegs) < 30:
+                    if len(pegs) == 0 or len(pegs) < 1:
                         print(
-                            "WARN: Level must have at least 30 pegs before it is saved...")
-                        # start the warning timer to display the message for 4 seconds
+                            "WARN: Level must have at least 1 peg before it is saved...")
                         warningTimer.setTimer(4)
                     else:
                         saveData(pegs)
