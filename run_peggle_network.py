@@ -82,7 +82,7 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
             # feed the network all the info about the gamestate
             # return an angle and what position in its cycle it wants the bucket to be
             if not ball.isAlive:
-                angle, bucket_pos = games_queue[0][0].getShot(GameState(pegs, ballsRemaining, score))
+                angle = games_queue[0][0].getShot(GameState(pegs, ballsRemaining, score, bucket.pos.x, bucket.vel.x))[0]
                 launchAim = Vector(math.cos(angle) + ball.pos.x, math.sin(angle) + ball.pos.y)
 
             # if mouse clicked then trigger ball launch
