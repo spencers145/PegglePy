@@ -11,7 +11,8 @@ def testNetworkFromWeights(weights: list[list[list[float]]], number_of_games: in
     network_to_test.setWeights(weights)
 
     test_out = testNetworks(manager, number_of_games, [(0, network_to_test)], network_controller_template, options)
-    print(test_out)
+    # only print a small fraction of the debug messages
+    if random.random() > 0.99: print("score: %.2f" %(test_out[0][0]))
     return test_out[0][0]
 
 def debugNetworkWeightSum(network: network.Network):
