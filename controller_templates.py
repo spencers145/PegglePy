@@ -91,11 +91,11 @@ class orangeAwareNeuralNetworkController(Controller):
                 input[memory[0]] = 1
 
         input.append(gamestate.BALLS)
+        input.append(gamestate.BUCKET_POS)
+        input.append(gamestate.BUCKET_VELOCITY)
 
-        for _ in range(len(self.peg_memory.keys()) + 1, self.network.getInputSize()):
+        for _ in range(len(self.peg_memory.keys()) + 3, self.network.getInputSize()):
             input.append(0)
-
-        #print(input)
 
         self.network.updateInputs(input)
         self.network.update()
