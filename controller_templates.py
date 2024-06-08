@@ -100,48 +100,5 @@ class orangeAwareNeuralNetworkController(Controller):
             out[0] += 3
         out[0] = round(100*(out[0] + 0.5))/100 - 0.5
         return out
-    
-class fullNeuralNetworkController(Controller):
-    def __init__(self, id: str, network: network.Network):
-        self.network = network
-        super().__init__(id, self.pickNeuralNetworkAdvisedMove)
-        self.peg_memory = None
-    
-    def reset(self):
-        self.peg_memory = None
 
-    def pickNeuralNetworkAdvisedMove(self, gamestate: GameState):
-        if self.peg_memory is None:
-            self.peg_memory = {}
-            for i in range(0, len(gamestate.PEGS)):
-                peg = gamestate.PEGS[i]
-                self.peg_memory[(peg.pos.x, peg.pos.y)] = (i, int(peg.color == "orange"), int(peg.color == "green"))
-        input = []
-        # note to self: make this not suck
-        for _ in range(0, 3*len(self.peg_memory.keys())):
-            input.append(0)
-        
-        for peg_pos in self.peg_memory.keys():
-            memory = self.peg_memory[peg_pos]
-            input[3 * memory[0] + 1] = memory[1]
-            input[3 * memory[0] + 2] = memory[2]
-        
-        for peg in gamestate.PEGS:
-            input[3 * self.peg_memory[(peg.pos.x, peg.pos.y)][0]] = 1
-
-        #print(input)
-
-        input.append(gamestate.BALLS)
-
-        for _ in range(3*len(self.peg_memory.keys()) + 1, self.network.getInputSize()):
-            input.append(0)
-
-        self.network.updateInputs(input)
-        self.network.update()
-        out = self.network.readOutput()
-        while out[0] > 1.5:
-            out[0] -= 3
-        while out[0] < -1.5:
-            out[0] += 3
-        out[0] = round(100*(out[0] + 0.5))/100 - 0.5
-        return out
+# consider implementing a q-learning controller
