@@ -189,6 +189,30 @@ def createStaticCircles(trajectory: list[Ball]) -> pygame.Surface:
 
     return staticCircles
 
+def quickResetGame(balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs, options, sub_index):
+    balls.clear()
+    balls.append(Ball(WIDTH/2, HEIGHT/25))
+    balls[0].reset()
+    ball = balls[0]
+    pegs.clear()
+    pegs = originPegs.copy()
+    for peg in pegs:
+        peg.reset()
+    if "color_map" in options.keys():
+        map_for_this_game = options["color_map"][sub_index]
+    else: map_for_this_game = None
+    pegs = createPegColors(pegs, map_for_this_game)
+    assignPegScreenLocation(pegs, segmentCount)
+    orangeCount = 0
+    for peg in pegs:
+        if peg.color == "orange":
+            orangeCount += 1
+    if "balls" in options.keys():
+        ballsRemaining = options["balls"]
+    else: ballsRemaining = 10
+    bucket.reset()
+    return ballsRemaining, False, 0, ball, 0, 0, pegs, orangeCount
+
 
 # quite horrendous, will be fixed in the future... hopefully :)
 def resetGame(balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs):

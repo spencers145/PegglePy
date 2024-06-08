@@ -63,14 +63,14 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
         # assign each peg a screen location, this is to better optimize collison detection (only check pegs on the same screen location as the ball)
         assignPegScreenLocation(pegs, segmentCount)
 
-        ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
-                    balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
-        ballsRemaining = base_balls
+        sub_index = 0
+
+        ballsRemaining, powerUpActive, powerUpCount, ball, score, pegsHit, pegs, orangeCount = quickResetGame(
+                    balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs, options, sub_index)
 
         history = {}
         results = {}
 
-        sub_index = 0
         game_id = getGameID(games_queue, sub_index)
 
         history[game_id] = []
@@ -230,9 +230,8 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                         history[game_id] = []
 
                     # reset the game
-                    ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, longShotBonus, staticImage = resetGame(
-                        balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs)
-                    ballsRemaining = base_balls
+                    ballsRemaining, powerUpActive, powerUpCount, ball, score, pegsHit, pegs, orangeCount = quickResetGame(
+                        balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs, options, sub_index)
 
             # bucket, pass the power up info for the bucket to update its collison and image
             bucket.update(powerUpType, powerUpActive)
