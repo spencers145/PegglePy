@@ -10,6 +10,8 @@ def testNetworkFromWeights(weights: list[list[list[float]]], number_of_games: in
     network_to_test = network.Network(layer_sizes, activation_type)
     network_to_test.setWeights(weights)
 
+    #print(weights)
+
     test_out = testNetworks(manager, number_of_games, [(0, network_to_test)], network_controller_template, options)
     # only print a small fraction of the debug messages
     if random.random() > 0.99: print("score: %.2f" %(test_out[0][0]))
@@ -155,7 +157,6 @@ def trainNetwork(generations: int,
 
     if verbose:
         print("RESULTS:")
-        print("Network proficiency: %.2f" %(score/50))
         print("Network proficiency: %.2f" %(score/100))
 
     return (score, seed[1], manager)

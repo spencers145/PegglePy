@@ -39,7 +39,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
         balls = []
         balls.append(Ball(WIDTH/2, HEIGHT/25))
         ball = balls[0]
-
         # some extra global variable initialization stuff
         bucket = Bucket()
         score = 0
@@ -173,7 +172,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                         if powerUpCount < 1:
                             powerUpActive = False
             
-            
             if not ball.isAlive:
                 # reset everything and remove hit pegs
                 if shouldClear:
@@ -183,7 +181,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                     balls.append(Ball(WIDTH/2, HEIGHT/25))
                     ball = balls[0]
                     ball.reset()
-                    done = False
                     ballsRemaining -= 1
 
                     history[game_id].append({
@@ -203,6 +200,7 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                 
                 # check if their are any orange pegs or if the player has no balls (lol)
                 if orangeCount == 0 or ballsRemaining < 1:
+                    # game over
                     peg_count = 0
                     for peg in pegs:
                         peg_count += 1

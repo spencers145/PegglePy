@@ -538,7 +538,6 @@ while gameRunning:
                 if live_test_manager.should_do_live_test:
                     angle = live_test_manager.test_controller.getShot(GameState(pegs, ballsRemaining, score, bucket.pos.x, bucket.vel.x))[0]
                     launchAim = Vector(math.cos(angle) + ball.pos.x, math.sin(angle) + ball.pos.y)
-                    #print(launchAim.getAngleDeg())
                 launchForce = subVectors(launchAim, ball.pos)
                 launchForce.setMag(LAUNCH_FORCE)
                 ball.applyForce(launchForce)

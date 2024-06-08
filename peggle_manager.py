@@ -12,7 +12,7 @@ class Manager:
         for game_id in history.keys():
             self.history[game_id] = history[game_id]
             self.results[game_id] = results[game_id]
-    
+
     def wipeResults(self):
         self.results = {}
 
