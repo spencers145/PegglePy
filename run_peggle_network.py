@@ -34,10 +34,6 @@ def getGameID(games_queue: list[tuple[controller_templates.Controller, int]], su
 def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, int]], options = {}):
     os.chdir("pegglepy")
     try:
-        if "balls" in options.keys():
-            base_balls = options["balls"]
-        else: base_balls = 10
-
         ### testing stuff ###
         balls: list[Ball]
         balls = []
