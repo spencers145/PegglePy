@@ -47,9 +47,9 @@ class basicNeuralNetworkController(Controller):
         self.network.updateInputs(input)
         self.network.update()
         out = self.network.readOutput()
-        while out[0] > 1.5:
+        while out[0] > 3:
             out[0] -= 3
-        while out[0] < -1.5:
+        while out[0] < 0:
             out[0] += 3
         # what if we only give it 400ish shots to choose from? instead of practically infinite
         out[0] = round(100*(out[0] + 0.5))/100 - 0.5
@@ -94,11 +94,11 @@ class orangeAwareNeuralNetworkController(Controller):
         self.network.updateInputs(input)
         self.network.update()
         out = self.network.readOutput()
-        while out[0] > 1.5:
+        while out[0] > 3.1:
             out[0] -= 3
-        while out[0] < -1.5:
+        while out[0] < -0.1:
             out[0] += 3
-        out[0] = round(100*(out[0] + 0.5))/100 - 0.5
+        out[0] = round(300*(out[0] + 0.5))/300 - 0.5
         return out
 
 # consider implementing a q-learning controller
