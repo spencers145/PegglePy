@@ -73,7 +73,7 @@ class orangeAwareNeuralNetworkController(Controller):
             self.peg_memory = {}
             for i in range(0, len(gamestate.PEGS)):
                 peg = gamestate.PEGS[i]
-                self.peg_memory[(peg.pos.x, peg.pos.y)] = (i, int(peg.color == "orange"))
+                self.peg_memory[(peg.pos.x, peg.pos.y)] = (i, peg.color == "orange", peg.color == "green")
         input = []
 
         # note to self: make this not suck
@@ -82,7 +82,13 @@ class orangeAwareNeuralNetworkController(Controller):
 
         for peg in gamestate.PEGS:
             memory = self.peg_memory[(peg.pos.x, peg.pos.y)]
-            input[memory[0]] = memory[1]
+
+            if memory[1]:
+                input[memory[0]] = 10
+            elif memory[2]:
+                input[memory[0]] = 50
+            else:
+                input[memory[0]] = 1
 
         input.append(gamestate.BALLS)
 
