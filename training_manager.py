@@ -28,7 +28,8 @@ def testNetworks(manager: peggle_manager.Manager,
              number_of_games_each: int,
              generation: list[tuple[int, network.Network]],
              network_controller_template,
-             options = {}) -> tuple[int, network.Network]:
+             options = {},
+             total_tests = 0) -> tuple[int, network.Network]:
     manager.wipeHistory()
     manager.wipeResults()
 
@@ -39,7 +40,17 @@ def testNetworks(manager: peggle_manager.Manager,
         player = network_controller_template("controller_n%d" %(i), network)
         games.append((player, number_of_games_each))
 
-    manager.runGames(games, options)
+    # if we are using a colormap, create a temporary clone
+    if "color_map" in options.keys() and total_tests:
+        original_color_map = options["color_map"].copy()
+        for _ in range(total_tests):
+            # discard all the maps we've already used this generation
+            options["color_map"].pop(0)
+        manager.runGames(games, options)
+        options["color_map"] = original_color_map
+    else:
+        manager.runGames(games, options)
+
     for game_id in manager.results.keys():
         # extract the index of the network we're dealing with
         controller_index = int(game_id.split("_")[1][1:])
@@ -63,6 +74,11 @@ def trainNetwork(generations: int,
 
     for i in range(1, generations + 1):
         generation = []
+
+        # while using a color map, shuffle every generation
+        if "color_map" in options.keys():
+            random.shuffle(options["color_map"])
+
         # first, generate a lot of randomly jostled networks
         # if this is the first generation, make 10x more than usual
         for j in range(0, (10 * generation_size if i == 1 else generation_size)):
@@ -89,7 +105,7 @@ def trainNetwork(generations: int,
             tests = round(base_tests_per_child * 2**(step - 1))
             total_tests += tests
 
-            step_generation = testNetworks(manager, tests, generation, network_controller_template, options)
+            step_generation = testNetworks(manager, tests, generation, network_controller_template, options, total_tests = total_tests)
             generation = []
 
             # debug code that activates if verbose is on
@@ -120,10 +136,6 @@ def trainNetwork(generations: int,
             print("generation %d final proficiency: %.2f" %(i, seed[0]/total_tests))
             print("---------------")
 
-    # get a final result to test the effectiveness of the model
-    score = testNetworks(manager, 50, [(0, seed[1])], network_controller_template, options)[0][0]
-
-    # explicitly print results if we are verbose
     if verbose:
         print("TRAINING PARAMETERS:")
         print("Generations: %d" %(generations))
@@ -131,8 +143,18 @@ def trainNetwork(generations: int,
         print("Base # of test-games per child: %d" %(base_tests_per_child))
         print("---------------")
         print("Balls used: %s" %(10 if "balls" not in options.keys() else options["balls"]))
+        print("Color map used: %s" %("false" if "color_map" not in options.keys() else "true"))
         print("---------------")
+
+    # get a final result to test the effectiveness of the model
+    # do not let the color map leak into our testing data
+    if "color_map" in options.keys():
+        options.pop("color_map")
+    score = testNetworks(manager, 100, [(0, seed[1])], network_controller_template, options)[0][0]
+
+    if verbose:
         print("RESULTS:")
         print("Network proficiency: %.2f" %(score/50))
+        print("Network proficiency: %.2f" %(score/100))
 
     return (score, seed[1], manager)

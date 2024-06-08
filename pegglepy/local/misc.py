@@ -64,42 +64,52 @@ def getScoreMultiplier(remainingOrangePegs, pegsHit=0) -> int:
         multiplier *= 100
     return multiplier
 
+def createPegColors(pegs: list[Peg], color_map: list = None) -> list[Peg]:
+    if color_map:
+        # update peg colors with a fixed map
+        for i in range(0, len(pegs)):
+            peg = pegs[i]
+            peg.color = color_map[i]
+            if peg.color == "orange":
+                peg.isOrange = True
+            elif peg.color == "green":
+                peg.isPowerUp = True
+            peg.update_color()
+    else:
+        target_oranges = 25
+        target_greens = 2
 
-def createPegColors(pegs: list[Peg]) -> list[Peg]:
-    target_oranges = 25
-    target_greens = 2
+        if len(pegs) < 27:
+            if debug:
+                print("WARN: Level has less than 27 pegs, continuing anyway...")
+            target_oranges = 1 if len(pegs) <= 3 else len(pegs) - 2
+            if len(pegs) <= 2:
+                target_greens = len(pegs) - target_oranges
+        elif len(pegs) > 120:
+            if debug:
+                print(
+                    "WARN: Level has excessive number of pegs, expect performance issues...")
 
-    if len(pegs) < 27:
-        if debug:
-            print("WARN: Level has less than 27 pegs, continuing anyway...")
-        target_oranges = 1 if len(pegs) <= 3 else len(pegs) - 2
-        if len(pegs) <= 2:
-            target_greens = len(pegs) - target_oranges
-    elif len(pegs) > 120:
-        if debug:
-            print(
-                "WARN: Level has excessive number of pegs, expect performance issues...")
+        peg_pool = pegs.copy()
 
-    peg_pool = pegs.copy()
+        # create orange pegs
+        orange_count = 0
+        while orange_count < target_oranges:
+            i = randint(0, len(peg_pool) - 1)
+            p = peg_pool.pop(i)
+            p.color = "orange"
+            p.isOrange = True
+            p.update_color()
 
-    # create orange pegs
-    orange_count = 0
-    while orange_count < target_oranges:
-        i = randint(0, len(peg_pool) - 1)
-        p = peg_pool.pop(i)
-        p.color = "orange"
-        p.isOrange = True
-        p.update_color()
+            orange_count += 1
 
-        orange_count += 1
-
-    # create green pegs
-    for _ in range(target_greens):
-        i = randint(0, len(peg_pool) - 1)
-        p = peg_pool.pop(i)
-        p.color = "green"
-        p.isPowerUp = True
-        p.update_color()
+        # create green pegs
+        for _ in range(target_greens):
+            i = randint(0, len(peg_pool) - 1)
+            p = peg_pool.pop(i)
+            p.color = "green"
+            p.isPowerUp = True
+            p.update_color()
 
     return pegs
 
@@ -245,9 +255,9 @@ def resetGame(balls, assignPegScreenLocation, createPegColors, bucket, pegs, ori
     frameRate = 144
     LongShotBonus = False
     # change the song
-    #stopMusic()
-    #loadRandMusic()
-    #playMusic()
+    stopMusic()
+    loadRandMusic()
+    playMusic()
     staticImage = createStaticImage(pegs)
     return ballsRemaining, powerUpActive, powerUpCount, pitch, pitchRaiseCount, ball, score, pegsHit, pegs, orangeCount, gameOver, alreadyPlayedOdeToJoy, frameRate, LongShotBonus, staticImage
 
