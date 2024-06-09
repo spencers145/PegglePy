@@ -100,11 +100,62 @@ class orangeAwareNeuralNetworkController(Controller):
         self.network.updateInputs(input)
         self.network.update()
         out = self.network.readOutput()
-        while out[0] > 3.1:
+        while out[0] > 3:
             out[0] -= 3
-        while out[0] < -0.1:
+        while out[0] < 0:
             out[0] += 3
-        out[0] = round(300*(out[0] + 0.5))/300 - 0.5
+        out[0] = round(1500*(out[0] + 0.5))/1500 - 0.5
+        return out
+
+class fullNeuralNetworkController(Controller):
+    def __init__(self, id: str, network: network.Network):
+        self.network = network
+        super().__init__(id, self.pickNeuralNetworkAdvisedMove)
+        self.peg_memory = None
+    
+    def reset(self):
+        self.peg_memory = None
+
+    def pickNeuralNetworkAdvisedMove(self, gamestate: GameState):
+        if self.peg_memory is None:
+            self.peg_memory = {}
+            for i in range(0, len(gamestate.PEGS)):
+                peg = gamestate.PEGS[i]
+                self.peg_memory[(peg.pos.x, peg.pos.y)] = (i, peg.color == "orange", peg.color == "green")
+        input = []
+
+        # note to self: make this not suck
+        for _ in range(0, len(self.peg_memory.keys())*3):
+            input.append(0)
+
+        for peg in gamestate.PEGS:
+            memory = self.peg_memory[(peg.pos.x, peg.pos.y)]
+
+            if memory[1]:
+                input[memory[0]*3] = 10
+            elif memory[2]:
+                input[memory[0]*3] = 50
+            else:
+                input[memory[0]*3] = 1
+            
+            input[memory[0]*3 + 1] = peg.pos.x
+            input[memory[0]*3 + 2] = peg.pos.y
+
+        input.append(gamestate.BALLS)
+        input.append(gamestate.BUCKET_POS)
+        input.append(gamestate.BUCKET_VELOCITY)
+
+        for _ in range(len(self.peg_memory.keys()) * 3 + 3, self.network.getInputSize()):
+            input.append(0)
+
+        self.network.updateInputs(input)
+        self.network.update()
+        out = self.network.readOutput()
+        while out[0] > 3:
+            out[0] -= 3
+        while out[0] < 0:
+            out[0] += 3
+        out[0] = round(1500*(out[0] + 0.5))/1500 - 0.5
         return out
 
 # consider implementing a q-learning controller
