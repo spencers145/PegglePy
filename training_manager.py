@@ -112,7 +112,7 @@ def trainNetwork(generations: int,
 
         # first, generate a lot of randomly jostled networks
         # if this is the first generation, make 10x more than usual
-        for j in range(0, (10 * generation_size if i == 1 else generation_size)):
+        for j in range(0 if i != 1 else 1, (generation_size if i != 1 else 10 * generation_size)):
             # make a new network based on the seed
             child_network = network.Network(layer_sizes, activation_type)
             child_network.setWeights(seed[1].weights)
