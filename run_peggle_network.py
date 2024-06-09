@@ -180,11 +180,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                 # reset everything and remove hit pegs
                 if shouldClear:
                     shouldClear = False
-                    balls.clear()  # clear all the balls
-                    # recreate the original ball
-                    balls.append(Ball(WIDTH/2, HEIGHT/25))
-                    ball = balls[0]
-                    ball.reset()
                     ballsRemaining -= 1
 
                     history[game_id].append({
@@ -193,8 +188,18 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                         "orange_pegs_left": orangeCount,
                         "score_this_turn": score_this_turn,
                         "score": score,
-                        "balls_left": ballsRemaining
+                        "balls_left": ballsRemaining,
+                        "ball_x": ball.pos.x,
+                        "bucket_x": bucket.pos.x,
+                        "ball_in_bucket": ball.inBucket
                     })
+                    
+                    balls.clear()  # clear all the balls
+                    # recreate the original ball
+                    balls.append(Ball(WIDTH/2, HEIGHT/25))
+                    ball = balls[0]
+                    ball.reset()
+                    
                     score_this_turn = 0
                     pegsHit = 0
                     for _ in range(8):  # temporary fix to bug with pegs not being removed
