@@ -117,9 +117,10 @@ def trainNetwork(generations: int,
             child_network = network.Network(layer_sizes, activation_type)
             child_network.setWeights(seed[1].weights)
             # jostle amount as a function of how many generations (i) and which child (j)
-            # effectively, i increase precision over time
-            # and every generation, j produce more networks close to the seed, and less far away  
-            magnitude = (j/10 if i == 1 else j)/i
+            # effectively, i increases precision over time
+            # and every generation, j produces more networks close to the seed, and less far away
+
+            magnitude = j/i * (distance_modifier if i != 1 else distance_modifier/10)
             child_network.jostleSelf(magnitude**0.5)
             generation.append((0, child_network))
 
