@@ -43,16 +43,21 @@ def testNetworks(manager: peggle_manager.Manager,
         player = network_controller_template("controller_n%d" %(i), network)
         games.append((player, number_of_games_each))
 
-    # if we are using a colormap, create a temporary clone
-    if "color_map" in options.keys() and total_tests:
+    if "color_map" in options and total_tests:
         original_color_map = options["color_map"].copy()
         for _ in range(total_tests):
             # discard all the maps we've already used this generation
             options["color_map"].pop(0)
-        manager.runGames(games, options)
-        options["color_map"] = original_color_map
-    else:
-        manager.runGames(games, options)
+    
+    if "level_map" in options and total_tests:
+        original_level_map = options["level_map"].copy()
+        for _ in range(total_tests):
+            options["level_map"].pop(0)
+    
+    manager.runGames(games, options)
+        
+    if "color_map" in options and total_tests: options["color_map"] = original_color_map
+    if "level_map" in options and total_tests: options["level_map"] = original_level_map
 
     for game_id in manager.results.keys():
         # extract the index of the network we're dealing with
@@ -79,8 +84,11 @@ def trainNetwork(generations: int,
         generation = []
 
         # while using a color map, shuffle every generation
-        if "color_map" in options.keys():
+        if "color_map" in options:
             random.shuffle(options["color_map"])
+        
+        if "level_map" in options:
+            random.shuffle(options["level_map"])
 
         # first, generate a lot of randomly jostled networks
         # if this is the first generation, make 10x more than usual

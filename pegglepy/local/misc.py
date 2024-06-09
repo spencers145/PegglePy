@@ -137,6 +137,14 @@ def loadLevel(filePath = None) -> tuple[list[Peg], list[Peg], int]:
 
     return pegs, originPegs, orangeCount, levelFileName
 
+def loadMappedLevel(map: list[tuple[float, float]]) -> tuple[list[Peg], list[Peg], int]:
+    pegs = []
+    #print(map)
+    for xyPos in map:
+        x, y = xyPos
+        pegs.append(Peg(x, y))
+
+    return pegs
 
 def loadDefaultLevel() -> tuple[list[Peg], list[Peg], int]:
     pegsPosList = createDefaultPegsPos()
@@ -204,20 +212,26 @@ def quickResetGame(balls, assignPegScreenLocation, createPegColors, bucket, pegs
     balls.append(Ball(WIDTH/2, HEIGHT/25))
     balls[0].reset()
     ball = balls[0]
-    pegs.clear()
-    pegs = originPegs.copy()
-    for peg in pegs:
-        peg.reset()
-    if "color_map" in options.keys():
-        map_for_this_game = options["color_map"][sub_index]
-    else: map_for_this_game = None
-    pegs = createPegColors(pegs, map_for_this_game)
+
+    if "level_map" in options:
+        pegs = loadMappedLevel(options["level_map"][sub_index])
+    else:
+        pegs = originPegs.copy()
+        for peg in pegs:
+            peg.reset()
+    
+    if "color_map" in options:
+        preset_colors = options["color_map"][sub_index]
+    else: preset_colors = None
+    pegs = createPegColors(pegs, preset_colors)
     assignPegScreenLocation(pegs, segmentCount)
+
     orangeCount = 0
     for peg in pegs:
         if peg.color == "orange":
             orangeCount += 1
-    if "balls" in options.keys():
+
+    if "balls" in options:
         ballsRemaining = options["balls"]
     else: ballsRemaining = 10
     bucket.reset()

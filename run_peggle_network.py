@@ -47,8 +47,12 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
         launchAim = Vector(0, 0)
 
         pegs: list[Peg]
-        pegs, originPegs, orangeCount, something = loadLevel("levels/Level 1.lvl")
-        originPegs = pegs.copy()
+        originPegs = None
+
+        if "level_map" in options:
+            pegs = loadMappedLevel(options["level_map"][0])
+        else:
+            pegs, originPegs, orangeCount, levelFileName = loadLevel("levels/5pegcurve.lvl")
 
         orangeCount = 0
         for peg in pegs:

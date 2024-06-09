@@ -48,3 +48,14 @@ def generateColorMap(length: int, peg_count: int) -> list[list]:
         color_map.append(this_game_map)
     
     return color_map
+
+def generateLevelMap(length: int, peg_count: int) -> list[list]:
+    # from 35 to 900 - 35 and from 150 to 1080 - 150
+    level_map = []
+    for _ in range(length):
+        this_game_map = []
+        for _ in range(peg_count):
+            peg_position = (random.randint(35, 865), random.randint(150, 930))
+            this_game_map.append(peg_position)
+        level_map.append(this_game_map)
+    return level_map
