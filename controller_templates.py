@@ -104,7 +104,6 @@ class orangeAwareNeuralNetworkController(Controller):
             out[0] -= 3
         while out[0] < 0:
             out[0] += 3
-        out[0] = round(1500*(out[0] + 0.5))/1500 - 0.5
         return out
 
 class fullNeuralNetworkController(Controller):
@@ -155,7 +154,6 @@ class fullNeuralNetworkController(Controller):
             out[0] -= 3
         while out[0] < 0:
             out[0] += 3
-        out[0] = round(1500*(out[0] + 0.5))/1500 - 0.5
         return out
 
 # consider implementing a q-learning controller
