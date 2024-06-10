@@ -71,6 +71,7 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
         results = {}
 
         game_id = getGameID(games_queue, sub_index)
+        best_proximity_score = 9999
 
         history[game_id] = []
 
@@ -108,9 +109,9 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                 #### collision ####
                 for p in pegs:
                     # ball physics and game logic
+                    proximity_score = abs(p.pos.x - ball.pos.x) + abs(p.pos.y - ball.pos.y)
+                    if proximity_score < best_proximity_score: best_proximity_score = proximity_score
                     if ball_pos_1 in p.pegScreenLocations or (ball_pos_2 and ball_pos_2 in p.pegScreenLocations):
-                        #score_this_turn += 0.2
-                        #score += 0.2
                         if isBallTouchingPeg(p.pos.x, p.pos.y, p.radius, ball.pos.x, ball.pos.y, ball.radius):
                             # resolve the collision between the ball and peg
                             # use the c implementation of the collision check
@@ -165,7 +166,6 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                 if not ball.inBucket and bucket.isInBucket(ball.pos.x, ball.pos.y):
                     ball.inBucket = True  # prevent the ball from triggering it multiple times
                     ballsRemaining += 1
-                
 
                 # if active spooky powerup
                 if powerUpActive:
@@ -191,8 +191,11 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                         "balls_left": ballsRemaining,
                         "ball_x": ball.pos.x,
                         "bucket_x": bucket.pos.x,
-                        "ball_in_bucket": ball.inBucket
+                        "ball_in_bucket": ball.inBucket,
+                        "best_distance_from_peg": best_proximity_score
                     })
+
+                    best_proximity_score = 9999
                     
                     balls.clear()  # clear all the balls
                     # recreate the original ball
@@ -235,6 +238,7 @@ def executeGameQueue(games_queue: list[tuple[controller_templates.Controller, in
                     # reset the game
                     ballsRemaining, powerUpActive, powerUpCount, ball, score, pegsHit, pegs, orangeCount = quickResetGame(
                         balls, assignPegScreenLocation, createPegColors, bucket, pegs, originPegs, options, sub_index)
+                    best_proximity_score = 9999
 
             # bucket, pass the power up info for the bucket to update its collison and image
             bucket.update(powerUpType, powerUpActive)

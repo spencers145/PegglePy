@@ -62,20 +62,24 @@ def testNetworks(manager: peggle_manager.Manager,
     for game_id in manager.results.keys():
         # extract the index of the network we're dealing with
         controller_index = int(game_id.split("_")[1][1:])
-        network_score = math.sqrt(manager.results[game_id]["score"])
 
+        network_score = 0
         # dish out severe punishments for missing all the pegs
         # getting a free ball makes it okay though
-        beefed_shots = 0
+        #beefed_shots = 0
         for turn in manager.history[game_id]:
-            if turn["pegs_hit_this_turn"] == 0 and not turn["ball_in_bucket"]:
-                beefed_shots += 1
-            
-        # any beefed shots result in a loss of score
-        if beefed_shots:
-            for _ in range(beefed_shots): network_score *= 0.5
-        #if not turn["ball_in_bucket"]:
-            #network_score *= 1080/(1080 + 16*abs(turn["bucket_x"] - turn["ball_x"]))
+            score_this_turn = turn["score_this_turn"]
+            if turn["pegs_hit_this_turn"] == 0:
+                if turn["ball_in_bucket"]:
+                    # do not encourage the AI to shoot tons of free balls please
+                    score_this_turn = 0
+                else:
+                    if turn["best_distance_from_peg"] == 9999:
+                        score_this_turn = 0
+                    else:
+                        score_this_turn = 500/(1 + 0.1*turn["best_distance_from_peg"])
+            score_this_turn *= 1080/(1080 + 16*abs(turn["bucket_x"] - turn["ball_x"]))
+            network_score += score_this_turn
 
         generation[controller_index] = (
             generation[controller_index][0] + network_score,
