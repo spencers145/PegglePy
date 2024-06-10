@@ -98,7 +98,7 @@ def trainNetwork(generations: int,
                     verbose = False,
                     debug = False) -> tuple[float, network.Network, dict, dict]:
     assert generation_size > 1, "Can't have generation size less than 2."
-    distance_modifier = 1/math.log(generation_size)
+    distance_modifier = 0.1/math.log(generation_size)
 
     manager = peggle_manager.Manager()
     # set our seed
